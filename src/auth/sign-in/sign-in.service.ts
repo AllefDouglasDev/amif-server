@@ -28,7 +28,15 @@ export class SignInService {
     const token = await this.tokenService.createToken(user.id);
     return {
       token,
-      userId: user.id,
+      id: user.id,
+      username: user.username,
+      createdAt: user.created_at,
+      creator: user.creator
+        ? {
+            id: user.creator.id,
+            username: user.creator.username,
+          }
+        : undefined,
     };
   }
 }

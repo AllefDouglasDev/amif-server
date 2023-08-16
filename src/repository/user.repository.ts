@@ -9,14 +9,22 @@ export class UserRepository {
   findByUsername(username: string) {
     return this.prisma.users.findUnique({
       where: { username, is_deleted: false },
-      include: { creator: true },
+      include: {
+        creator: {
+          select: { id: true, username: true },
+        },
+      },
     });
   }
 
   findById(id: string) {
     return this.prisma.users.findUnique({
       where: { id, is_deleted: false },
-      include: { creator: true },
+      include: {
+        creator: {
+          select: { id: true, username: true },
+        },
+      },
     });
   }
 

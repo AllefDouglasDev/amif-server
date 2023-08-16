@@ -12,5 +12,11 @@ export class SignInInputDto {
 
 export class SignInOutputDto {
   token: string;
-  userId: string;
+  id: string;
+  username: string;
+  createdAt: Date;
+  creator?: {
+    id: string;
+    username: string;
+  };
 }
