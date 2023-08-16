@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { User } from '../common/entities/user';
+import { Order } from '../common/entities/paged';
 
 @Injectable()
 export class UserRepository {
@@ -28,6 +29,26 @@ export class UserRepository {
     });
   }
 
+  async listPaged(args: ListUsersPagedArgs) {
+    const total = await this.prisma.users.count({
+      where: { is_deleted: false },
+    });
+    const users = await this.prisma.users.findMany({
+      where: { is_deleted: false },
+      take: args.perPage,
+      skip: args.perPage * (args.page - 1),
+      orderBy: {
+        [args.sortBy]: args.orderBy,
+      },
+      include: {
+        creator: {
+          select: { id: true, username: true },
+        },
+      },
+    });
+    return { users, total };
+  }
+
   save(user: User) {
     return this.prisma.users.create({
       data: {
@@ -40,3 +61,18 @@ export class UserRepository {
     });
   }
 }
+
+export interface UserSortBy {
+  username: string;
+  createdAt: string;
+}
+
+export type ListUsersPagedArgs = {
+  page: number;
+  perPage: number;
+  creatorId: string;
+  username?: string;
+  createdAt?: string;
+  sortBy: keyof UserSortBy;
+  orderBy: Order;
+};
