@@ -34,7 +34,6 @@ export class UserController {
   ) {}
 
   @Get('/')
-  @HttpCode(HttpStatus.CREATED)
   listUsersPaged(
     @UserId() creatorId: string,
     @Query() input: ListUsersPagedInputDto,
