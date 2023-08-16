@@ -30,13 +30,8 @@ export class SignInService {
       token,
       id: user.id,
       username: user.username,
-      createdAt: user.created_at,
-      creator: user.creator
-        ? {
-            id: user.creator.id,
-            username: user.creator.username,
-          }
-        : undefined,
+      createdAt: user.createdAt,
+      creator: user.creator,
     };
   }
 }

@@ -31,7 +31,7 @@ export class CreateUserService {
       password: await this.encryptionService.encrypt(input.password),
       isDeleted: false,
     };
-    await this.userRepository.save(user);
+    await this.userRepository.create(user);
     return { userId: user.id };
   }
 }

@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ import {
   ListUsersPagedOutputDto,
 } from './list-users-paged/list-users-paged.dto';
 import { ListUsersPagedService } from './list-users-paged/list-users-paged.service';
+import { UpdateUserService } from './update-user/update-user.service';
+import { UpdateUserInputDto } from './update-user/update-user.dto';
 
 @Controller('users')
 @UseGuards(JwtGuard)
@@ -27,6 +30,7 @@ export class UserController {
   constructor(
     private listUsersPagedService: ListUsersPagedService,
     private createUserService: CreateUserService,
+    private updateUserService: UpdateUserService,
   ) {}
 
   @Get('/')
@@ -45,5 +49,14 @@ export class UserController {
     @Body() input: CreateUserInputDto,
   ): Promise<CreateUserOutputDto> {
     return this.createUserService.execute({ ...input, creatorId });
+  }
+
+  @Put('/')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  updateUser(
+    @UserId() id: string,
+    @Body() input: UpdateUserInputDto,
+  ): Promise<void> {
+    return this.updateUserService.execute({ ...input, id });
   }
 }

@@ -7,8 +7,8 @@ import { Order } from '../common/entities/paged';
 export class UserRepository {
   constructor(private prisma: PrismaService) {}
 
-  findByUsername(username: string) {
-    return this.prisma.users.findUnique({
+  async findByUsername(username: string): Promise<User | null> {
+    const user = await this.prisma.users.findUnique({
       where: { username, is_deleted: false },
       include: {
         creator: {
@@ -16,10 +16,18 @@ export class UserRepository {
         },
       },
     });
+    if (!user) return null;
+    return {
+      id: user.id,
+      username: user.username,
+      password: user.password,
+      creator: user.creator,
+      isDeleted: user.is_deleted,
+    };
   }
 
-  findById(id: string) {
-    return this.prisma.users.findUnique({
+  async findById(id: string): Promise<User | null> {
+    const user = await this.prisma.users.findUnique({
       where: { id, is_deleted: false },
       include: {
         creator: {
@@ -27,14 +35,22 @@ export class UserRepository {
         },
       },
     });
+    if (!user) return null;
+    return {
+      id: user.id,
+      username: user.username,
+      password: user.password,
+      creator: user.creator,
+      isDeleted: user.is_deleted,
+    };
   }
 
   async listPaged(args: ListUsersPagedArgs) {
     const total = await this.prisma.users.count({
-      where: { is_deleted: false },
+      where: { creator_id: args.creatorId, is_deleted: false },
     });
     const users = await this.prisma.users.findMany({
-      where: { is_deleted: false },
+      where: { creator_id: args.creatorId, is_deleted: false },
       take: args.perPage,
       skip: args.perPage * (args.page - 1),
       orderBy: {
@@ -49,7 +65,7 @@ export class UserRepository {
     return { users, total };
   }
 
-  save(user: User) {
+  create(user: User) {
     return this.prisma.users.create({
       data: {
         id: user.id,
@@ -58,6 +74,16 @@ export class UserRepository {
         creator_id: user.creatorId,
         is_deleted: user.isDeleted,
       },
+    });
+  }
+
+  update(user: User) {
+    return this.prisma.users.update({
+      data: {
+        username: user.username,
+        password: user.password,
+      },
+      where: { id: user.id },
     });
   }
 }
